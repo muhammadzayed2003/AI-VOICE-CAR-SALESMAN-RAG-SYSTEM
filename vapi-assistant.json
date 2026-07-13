@@ -1,0 +1,74 @@
+{
+    "name":  "Riley",
+    "voice":  {
+                  "speed":  1.15,
+                  "voiceId":  "Naina",
+                  "provider":  "vapi"
+              },
+    "createdAt":  "2026-07-12T09:26:38.332Z",
+    "updatedAt":  "2026-07-12T12:32:20.151Z",
+    "model":  {
+                  "model":  "gpt-4.1",
+                  "messages":  [
+                                   {
+                                       "role":  "system",
+                                       "content":  "You are a friendly, knowledgeable car sales agent at Zee Motors showroom in Bahria Town, Islamabad. You help customers find the right car based on their budget and needs, answer questions about pricing, specs, financing, test drives, and showroom policies. Use the search_inventory tool whenever a customer asks about specific cars, prices, specs, or showroom details — never guess or make up information. Keep every response to 2-3 short sentences maximum since this is a spoken phone conversation. Be conversational, warm, and persuasive but honest. Try to move the conversation toward booking a test drive or showroom visit. You can understand and respond in both English and Urdu, matching whatever the customer speaks.\n\n"
+                                   }
+                               ],
+                  "provider":  "openai",
+                  "temperature":  0.5
+              },
+    "firstMessage":  "AsSalaam oalayikum! Welcome to Zee Motors. I'm your sales assistant — how can I help, are you looking for a specific car or just want some details?",
+    "voicemailMessage":  "Hello, this is Riley from Zee Motors. I'm calling about your inquiry. Please call us back at your earliest convenience so we can help you find the right car.",
+    "endCallMessage":  "Thank you for calling Zee Motors. We look forward to seeing you at the showroom soon. Have a wonderful day!",
+    "transcriber":  {
+                        "model":  "nova-3",
+                        "language":  "en",
+                        "provider":  "deepgram",
+                        "endpointing":  150,
+                        "fallbackPlan":  {
+                                             "autoFallback":  {
+                                                                  "enabled":  true
+                                                              }
+                                         }
+                    },
+    "clientMessages":  [
+                           "conversation-update",
+                           "function-call",
+                           "hang",
+                           "model-output",
+                           "speech-update",
+                           "status-update",
+                           "transfer-update",
+                           "transcript",
+                           "tool-calls",
+                           "user-interrupted",
+                           "voice-input",
+                           "workflow.node.started",
+                           "assistant.started"
+                       ],
+    "serverMessages":  [
+                           "conversation-update",
+                           "end-of-call-report",
+                           "function-call",
+                           "hang",
+                           "speech-update",
+                           "status-update",
+                           "tool-calls",
+                           "transfer-destination-request",
+                           "handoff-destination-request",
+                           "user-interrupted",
+                           "assistant.started"
+                       ],
+    "endCallPhrases":  [
+                           "goodbye",
+                           "talk to you soon"
+                       ],
+    "hipaaEnabled":  false,
+    "backgroundDenoisingEnabled":  false,
+    "startSpeakingPlan":  {
+                              "waitSeconds":  0.4,
+                              "smartEndpointingEnabled":  "livekit"
+                          },
+    "isServerUrlSecretSet":  false
+}

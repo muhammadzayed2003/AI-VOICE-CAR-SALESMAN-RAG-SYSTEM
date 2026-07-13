@@ -1,0 +1,381 @@
+{
+  "name": "AI-VOICE-SALESMAN-RAG-SYSTEM",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "INVENTORY_DETAILS_",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        -32
+      ],
+      "id": "5d19a7d6-ccc2-4758-86a4-53ba4cc7744c",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        -160
+      ],
+      "id": "676d572e-1eb4-4974-a6e8-386b93bcdab5",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "vddB7LUQ5P8g15Eu",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        32
+      ],
+      "id": "e5c1e2fc-facc-424c-8bef-56f091a55e74",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "car-voice-agent-v2",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -256,
+        480
+      ],
+      "id": "d959e329-9ac3-419c-a3b4-a03e192d7b2a",
+      "name": "Webhook1",
+      "webhookId": "1c6d0422-a542-4970-a561-f7105fb9388a"
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "prompt": "={{ $json.query }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        304
+      ],
+      "id": "ac7f98c4-b750-4f76-a732-fb61f408fe0a",
+      "name": "Supabase Vector Store2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "vddB7LUQ5P8g15Eu",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        416,
+        496
+      ],
+      "id": "7bb87b90-46d9-457d-8500-f10e1ae52b0a",
+      "name": "Embeddings Google Gemini2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "XQkLJIDwuUGQ2gt0",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const toolCallId = $('Code in JavaScript2').first().json.toolCallId;\nconst chunks = $input.all().map(item => \n  item.json.document?.pageContent || item.json.content || item.json.pageContent || ''\n);\nreturn [{ json: { toolCallId, result: chunks.join('\\n\\n') } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        368
+      ],
+      "id": "6a79519a-eb78-472b-9eea-0cded7cee0e6",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { results: [ { toolCallId: $json.toolCallId, result: $json.result } ] } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        864,
+        496
+      ],
+      "id": "496db622-757b-4865-8937-ddf56896d98d",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body;\nconst toolCall = body.message.toolCallList[0];\nconst key = 'arg' + 'uments';\nconst args = toolCall.function[key];\nreturn [{ json: { query: args.query, toolCallId: toolCall.id } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        416
+      ],
+      "id": "55ae2405-f236-4757-bb02-6b95ae1ad682",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "content": "DATA INJESTION PIPELINE",
+        "height": 384,
+        "width": 1376
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -208
+      ],
+      "id": "5555a8d4-1c86-4acc-b9a1-cdd84f754036",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "formTitle": "CAR SALES AI",
+        "formDescription": "Input your info and Drop your inventory details in a pdf.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "NAME:",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "SHOWROOM NAME:",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "INVENTORY DETAILS:",
+              "fieldType": "file",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "926f571f-e920-46cf-ad2c-ece77c1a2800",
+      "name": "Insertion of data",
+      "webhookId": "fce8b842-28e7-44e3-9036-b21c047ab84b"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.text;\nconst chunks = text.split(/(?=Car #\\d+:)/g).filter(c => c.trim().length > 0);\n\nreturn chunks.map((chunk, i) => {\n  const modelMatch = chunk.match(/Car #\\d+:\\s*(.+)/);\n  const priceMatch = chunk.match(/Price:\\s*(.+)/);\n\n  return {\n    json: {\n      content: chunk.trim(),\n      metadata: {\n        source_type: \"car_inventory\",\n        model: modelMatch ? modelMatch[1].trim() : \"unknown\",\n        price: priceMatch ? priceMatch[1].trim() : \"unknown\",\n        chunk_index: i\n      }\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -64
+      ],
+      "id": "802328de-d281-4983-9b8f-d5c506a0e698",
+      "name": "Chunking"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        624,
+        32
+      ],
+      "id": "57ba33ac-966d-419c-9247-31f7c3173aa5",
+      "name": "Embedding data",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "WzKQUn1LqBUud0PB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "DATA RETRIVAL PIPELINE",
+        "height": 416,
+        "width": 1392
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        256
+      ],
+      "id": "d86dc9e9-c930-4c6d-ba74-4e76667d02f0",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Chunking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insertion of data": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunking": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embedding data": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "469ca70c-1850-451a-af25-41826815fe27",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "de84a8b00bb17e6001d7ea1f37489a71c7cb307c2cd2af4109bd987e06ec0e6c"
+  },
+  "nodeGroups": [],
+  "id": "ny2lA7FW1zZCJ2M4",
+  "tags": []
+}
